@@ -37,8 +37,6 @@ public class GameLogic {
             int selectedY = selectedPiecePos.getY();
             MoveTypeEnum moveType = getMoveType(board.getPieceByIndices(selectedX, selectedY), selectedPiecePos, new Position(x, y));
 
-            //System.out.println(isLegalMove(board.getPieceByIndices(selectedX, selectedY),selectedPiecePos,new Position(x,y)));
-
             if (moveType != MoveTypeEnum.ILLEGAL) {
                 Board tempBoard = new Board(board);
                 Position tempSelectedPiecePos = selectedPiecePos;

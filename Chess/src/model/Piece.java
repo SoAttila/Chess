@@ -1,7 +1,6 @@
 package model;
 
 public class Piece {
-    //private Position pos;
     private PlayerEnum player;
     private PieceEnum type;
     private boolean moved;
