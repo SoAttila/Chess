@@ -199,7 +199,7 @@ public class GameLogic {
                     return MoveTypeEnum.KING_MOVE;
                 else if (!pieces[fx][fy].isMoved() && fy == ty && !isInCheck(piece.getPlayer())) {
                     if (tx == 2 && pieces[0][ty] != null && !pieces[0][ty].isMoved()) {
-                        for (int i = 1; i < 4; ++i)
+                        for (int i = 2; i < 4; ++i)
                             if (pieces[i][ty] != null || isInCheck(piece.getPlayer(), new Position(i, ty)))
                                 return MoveTypeEnum.ILLEGAL;
                         return MoveTypeEnum.LONG_CASTLING;
