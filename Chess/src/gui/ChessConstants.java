@@ -9,6 +9,8 @@ public final class ChessConstants {
     public static final int BOARD_SIZE = 8;
     public static final Color DARK_SQUARE_COLOR = new Color(117, 63, 43);
     public static final Color LIGHT_SQUARE_COLOR = new Color(191, 148, 90);
+    public static final Color ATTACKED_DARK_SQUARE_COLOR = new Color(178, 42, 42);
+    public static final Color ATTACKED_LIGHT_SQUARE_COLOR = new Color(255, 81, 81);
     public static final ImageIcon WHITE_KING = new ImageIcon("images/wk.png");
     public static final ImageIcon WHITE_QUEEN = new ImageIcon("images/wq.png");
     public static final ImageIcon WHITE_ROOK = new ImageIcon("images/wr.png");
