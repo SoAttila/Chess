@@ -2,16 +2,15 @@ package model;
 
 import gui.ChessConstants;
 
-import javax.crypto.AEADBadTagException;
 import java.util.ArrayList;
 
 public class GameLogic {
+    private final ArrayList<Position> attackedPositions;
     private Board board;
     private PlayerEnum turn;
     private GameStatusEnum gameStatus;
     private Position selectedPiecePos;
     private ArrayList<Position> changedPositions;
-    private final ArrayList<Position> attackedPositions;
     private Position blackKingPos, whiteKingPos;
     private Position possibleEnPassantPos;
 
@@ -105,11 +104,11 @@ public class GameLogic {
 
     public void updateAttackedPositions() {
         attackedPositions.clear();
-        if (selectedPiecePos!=null) {
-            for (int i=0;i<ChessConstants.BOARD_SIZE;++i)
-                for (int j=0;j<ChessConstants.BOARD_SIZE;++j) {
-                    Position attackedPos=new Position(i,j);
-                    if (isLegalMove(getBoard().getPieceByIndices(selectedPiecePos.getX(), selectedPiecePos.getY()),selectedPiecePos,attackedPos))
+        if (selectedPiecePos != null) {
+            for (int i = 0; i < ChessConstants.BOARD_SIZE; ++i)
+                for (int j = 0; j < ChessConstants.BOARD_SIZE; ++j) {
+                    Position attackedPos = new Position(i, j);
+                    if (isLegalMove(getBoard().getPieceByIndices(selectedPiecePos.getX(), selectedPiecePos.getY()), selectedPiecePos, attackedPos))
                         attackedPositions.add(attackedPos);
                 }
         }
@@ -122,45 +121,24 @@ public class GameLogic {
         if (pieces[tx][ty] != null && piece.getPlayer() == pieces[tx][ty].getPlayer()) return MoveTypeEnum.ILLEGAL;
         switch (piece.getType()) {
             case PAWN:
-                switch (piece.getPlayer()) {
-                    case BLACK:
-                        //pawn capture
-                        if (pieces[tx][ty] != null && ((fx == tx - 1 && fy == ty - 1) || (fx == tx + 1 && fy == ty - 1))) {
-                            if (ty == 7)
-                                return MoveTypeEnum.PROMOTION;
-                            return MoveTypeEnum.MOVE;
-                        } else if (possibleEnPassantPos != null && tx == possibleEnPassantPos.getX() && ty == possibleEnPassantPos.getY() && fy == 4 && Math.abs(fx - tx) == 1)
-                            return MoveTypeEnum.EN_PASSANT;
-                            //pawn step
-                        else if (pieces[tx][ty] == null) {
-                            if (fx == tx && fy == ty - 1) {
-                                if (ty == 7)
-                                    return MoveTypeEnum.PROMOTION;
-                                return MoveTypeEnum.MOVE;
-                            } else if (fy == 1 && (fx == tx && fy == ty - 2) && pieces[fx][fy + 1] == null)
-                                return MoveTypeEnum.PAWN_2_SQUARE;
-                        }
-                        return MoveTypeEnum.ILLEGAL;
-                    case WHITE:
-                        //pawn capture
-                        if (pieces[tx][ty] != null && ((fx == tx - 1 && fy == ty + 1) || (fx == tx + 1 && fy == ty + 1))) {
-                            if (ty == 0)
-                                return MoveTypeEnum.PROMOTION;
-                            return MoveTypeEnum.MOVE;
-                        } else if (possibleEnPassantPos != null && tx == possibleEnPassantPos.getX() && ty == possibleEnPassantPos.getY() && fy == 3 && Math.abs(fx - tx) == 1) {
-                            return MoveTypeEnum.EN_PASSANT;
-                        }
-                        //pawn step
-                        else if (pieces[tx][ty] == null) {
-                            if (fx == tx && fy == ty + 1) {
-                                if (ty == 0)
-                                    return MoveTypeEnum.PROMOTION;
-                                return MoveTypeEnum.MOVE;
-                            } else if (fy == 6 && (fx == tx && fy == ty + 2) && pieces[fx][fy - 1] == null)
-                                return MoveTypeEnum.PAWN_2_SQUARE;
-                        }
-                        return MoveTypeEnum.ILLEGAL;
+                PlayerEnum player = piece.getPlayer();
+                boolean isRightDirection = fy == ty + (player == PlayerEnum.WHITE ? 1 : -1);
+                if (pieces[tx][ty] != null && ((fx == tx - 1 && isRightDirection) || (fx == tx + 1 && isRightDirection))) {
+                    if (ty == (player == PlayerEnum.WHITE ? 0 : 7))
+                        return MoveTypeEnum.PROMOTION;
+                    return MoveTypeEnum.MOVE;
+                } else if (possibleEnPassantPos != null && tx == possibleEnPassantPos.getX() && ty == possibleEnPassantPos.getY() && fy == (player == PlayerEnum.WHITE ? 3 : 4) && Math.abs(fx - tx) == 1)
+                    return MoveTypeEnum.EN_PASSANT;
+                    //pawn step
+                else if (pieces[tx][ty] == null) {
+                    if (fx == tx && isRightDirection) {
+                        if (ty == (player == PlayerEnum.WHITE ? 0 : 7))
+                            return MoveTypeEnum.PROMOTION;
+                        return MoveTypeEnum.MOVE;
+                    } else if (fy == (player == PlayerEnum.WHITE ? 6 : 1) && (fx == tx && fy == ty + (player == PlayerEnum.WHITE ? 2 : -2)) && pieces[fx][fy + (player == PlayerEnum.WHITE ? -1 : 1)] == null)
+                        return MoveTypeEnum.PAWN_2_SQUARE;
                 }
+                return MoveTypeEnum.ILLEGAL;
             case KNIGHT:
                 if ((dx == 1 && dy == 2) || (dx == 2 && dy == 1))
                     return MoveTypeEnum.MOVE;
@@ -216,7 +194,7 @@ public class GameLogic {
                 else if (!pieces[fx][fy].isMoved() && fy == ty && !isInCheck(piece.getPlayer())) {
                     if (tx == 2 && pieces[0][ty] != null && !pieces[0][ty].isMoved()) {
                         for (int i = 1; i < 4; ++i)
-                            if (pieces[i][ty] != null || (i!=1 && isInCheck(piece.getPlayer(), new Position(i, ty))))
+                            if (pieces[i][ty] != null || (i != 1 && isInCheck(piece.getPlayer(), new Position(i, ty))))
                                 return MoveTypeEnum.ILLEGAL;
                         return MoveTypeEnum.LONG_CASTLING;
                     } else if (tx == 6 && pieces[7][ty] != null && !pieces[7][ty].isMoved()) {
@@ -258,7 +236,7 @@ public class GameLogic {
         if (moveType != MoveTypeEnum.ILLEGAL) {
             Board tempBoard = new Board(board);
             Position tempSelectedPiecePos = selectedPiecePos;
-            ArrayList<Position> tempChangedPositions=new ArrayList<>(changedPositions);
+            ArrayList<Position> tempChangedPositions = new ArrayList<>(changedPositions);
             Position tempBlackKingPos = blackKingPos, tempWhiteKingPos = whiteKingPos;
             Position tempPossibleEnPassantPos = possibleEnPassantPos;
 
@@ -301,7 +279,7 @@ public class GameLogic {
 
             board = tempBoard;
             selectedPiecePos = tempSelectedPiecePos;
-            changedPositions=tempChangedPositions;
+            changedPositions = tempChangedPositions;
             blackKingPos = tempBlackKingPos;
             whiteKingPos = tempWhiteKingPos;
             possibleEnPassantPos = tempPossibleEnPassantPos;

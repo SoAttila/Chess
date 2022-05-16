@@ -13,10 +13,15 @@ import java.awt.event.MouseListener;
 public class ChessGamePanel extends JPanel {
     private final ChessSquare[][] squares;
     private GameLogic logic;
+
     public ChessGamePanel() {
         squares = new ChessSquare[ChessConstants.BOARD_SIZE][ChessConstants.BOARD_SIZE];
         logic = new GameLogic();
         setupGamePanel();
+    }
+
+    private ImageIcon getScaledImageIcon(ImageIcon baseImageIcon) {
+        return new ImageIcon(baseImageIcon.getImage().getScaledInstance(ChessConstants.WINDOW_SIZE / 10, ChessConstants.WINDOW_SIZE / 10, java.awt.Image.SCALE_SMOOTH));
     }    private final MouseListener select = new MouseListener() {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -29,8 +34,8 @@ public class ChessGamePanel extends JPanel {
             for (Position pos : logic.getChangedPositions()) {
                 updateSquare(pos);
             }
-            for (int i=0;i<ChessConstants.BOARD_SIZE;++i)
-                for (int j=0;j<ChessConstants.BOARD_SIZE;++j) {
+            for (int i = 0; i < ChessConstants.BOARD_SIZE; ++i)
+                for (int j = 0; j < ChessConstants.BOARD_SIZE; ++j) {
                     if ((i + j) % 2 == 0) squares[i][j].setBackground(ChessConstants.LIGHT_SQUARE_COLOR);
                     else squares[i][j].setBackground(ChessConstants.DARK_SQUARE_COLOR);
                 }
@@ -65,17 +70,13 @@ public class ChessGamePanel extends JPanel {
         }
     };
 
-    private ImageIcon getScaledImageIcon(ImageIcon baseImageIcon) {
-        return new ImageIcon(baseImageIcon.getImage().getScaledInstance(ChessConstants.WINDOW_SIZE / 10, ChessConstants.WINDOW_SIZE / 10, java.awt.Image.SCALE_SMOOTH));
-    }
-
     private void setupGamePanel() {
         setLayout(new GridLayout(ChessConstants.BOARD_SIZE, ChessConstants.BOARD_SIZE));
         updateGamePanel();
     }
 
     private void highlightPos(Position pos) {
-        int x=pos.getX(), y=pos.getY();
+        int x = pos.getX(), y = pos.getY();
 
         if ((x + y) % 2 == 0) squares[x][y].setBackground(ChessConstants.ATTACKED_LIGHT_SQUARE_COLOR);
         else squares[x][y].setBackground(ChessConstants.ATTACKED_DARK_SQUARE_COLOR);
@@ -163,6 +164,8 @@ public class ChessGamePanel extends JPanel {
         revalidate();
         repaint();
     }
+
+
 
 
 }
